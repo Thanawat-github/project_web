@@ -166,8 +166,6 @@ $(document).ready(async function() {
 
         if (counter <= 5 && counter >= 0) {
 
-            //for(let i=counter-1; i>=0; i--){
-            //console.log(i) 
             var video = document.getElementById('vidDisplay');
             var canvas = document.createElement('canvas');
             canvas.width = 800;

@@ -273,11 +273,16 @@ if (isset($_GET['subid'])) {
     var dtf = JSON.parse(dataFetch);
 
     const videoEl = $('#vidDisplay').get(0)
-    // if (videoEl.paused || videoEl.ended){
-    //   return myTimeout = setTimeout(() => onPlay())
-    // }
+    if (videoEl.paused || videoEl.ended) {
+      setTimeout(() => onPlay())
+    }
     $("#overlay").show()
     const canvas = $('#overlay').get(0)
+    var video = document.getElementById('vidDisplay');
+    var capimg = document.createElement('canvas');
+    var context = capimg.getContext('2d');
+    context.drawImage(video, 0, 0, 200, 150);
+    var capURL = capimg.toDataURL('image/png');
 
     if (faceMatcher != undefined) {
       //--------------------------FACE RECOGNIZE------------------
@@ -317,7 +322,8 @@ if (isset($_GET['subid'])) {
                     cr_checkin: last_id,
                     std_checkin: dtf[index].std_id,
                     sub_checkin: subid,
-                    time_checkin: '<?= $date ?>'
+                    time_checkin: '<?= $date ?>',
+                    capimg:capURL
                   },
                   success: function(response) {
                     var jsonData = JSON.parse(response);

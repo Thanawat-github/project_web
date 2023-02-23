@@ -7,11 +7,10 @@ if (!isset($_SESSION['id_teacher'])) {
     exit;
 }
 
-if (isset($_GET['repid'])&&isset($_GET['subid'])) {
+if (isset($_GET['repid']) && isset($_GET['subid'])) {
 
     $repid = $_GET['repid'];
     $subid = $_GET['subid'];
-
 } else {
 
     $_SESSION['error'] = "เกิดข้อผิดพลาด! ไม่พบข้อมูล!";
@@ -19,17 +18,15 @@ if (isset($_GET['repid'])&&isset($_GET['subid'])) {
     exit;
 }
 
-if (isset($_GET['delete_repstd'])) {
+if (isset($_GET['delete_repstd']) && isset($_GET['delimg'])) {
 
     $delete_repstd = $_GET['delete_repstd'];
     $del_repstd = $lms->delete('checkin', "id='$delete_repstd'");
 
     if (!empty($del_repstd)) {
-
         $_SESSION['success'] = "นำรายชื่อออกสำเร็จ!";
         echo "<script>window.history.back();</script>";
         exit;
-
     } else {
 
         whenerror();
@@ -62,29 +59,30 @@ if (isset($_GET['delete_repstd'])) {
                         <table class="table user-list" id="reportdtTable">
                             <thead>
                                 <tr>
-                                    <th style="width:10%;"><span>ลำดับ</span></th>
+                                    <th style="width:10%;"><span>ภาพ</span></th>
+                                    <th style="width:13%;"><span>เวลาเช็ค</span></th>
                                     <th style="width:20%;"><span>รหัสนักศึกษา</span></th>
-                                    <th style="width:10%;"><span>คำนำหน้า</span></th>
                                     <th style="width:25%;"><span>ชื่อ</span></th>
                                     <th style="width:25%;"><span>นามสกุล</span></th>
-                                    <th style="width:10%;"><span>ตัวเลือก</span></th>
+                                    <th style="width:7%;"><span>ตัวเลือก</span></th>
                                 </tr>
                             </thead>
                             <?php
                             $noindex = 0;
-                            $reportdt_page = $lms->select('student s JOIN checkin c  ON s.id = c.id_std', 'c.id as thisid,id_std,std_id,prefix,fname,lname', "c.id_croom ='$repid'");
+                            $reportdt_page = $lms->select('student s JOIN checkin c  ON s.id = c.id_std', 'img_check,ctime,c.id as thisid,id_std,std_id,prefix,fname,lname', "c.id_croom ='$repid'");
                             foreach ($reportdt_page as $reportdt_list) {
-                                $noindex++;
                             ?>
                                 <tr>
                                     <td>
-                                        <?= $noindex ?>
+                                        <div width="100" height="75" style="overflow:hidden;">
+                                            <img src="<?= $reportdt_list['img_check'] ?>" width="150" height="75">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <?= $reportdt_list['ctime'] ?>
                                     </td>
                                     <td>
                                         <?= $reportdt_list['std_id'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $reportdt_list['prefix'] ?>
                                     </td>
                                     <td>
                                         <?= $reportdt_list['fname'] ?>
@@ -99,9 +97,7 @@ if (isset($_GET['delete_repstd'])) {
                                             <ul class="dropdown-menu">
                                                 <li><a class="dropdown-item stdview" id="<?= $reportdt_list['id_std'] ?>" data-bs-toggle="modal" data-bs-target="#studentModal">view</a>
                                                 </li>
-                                                <li><a class="dropdown-item delete_checkin"
-                                                        id="<?= $reportdt_list['thisid'] ?>"
-                                                        data-name-std="<?= $reportdt_list['fname'].' '.$reportdt_list['lname'] ?>">delete
+                                                <li><a class="dropdown-item delete_checkin" id="<?= $reportdt_list['thisid'] ?>" data-name-std="<?= $reportdt_list['fname'] . ' ' . $reportdt_list['lname'] ?>" >delete
                                                         from class</a>
                                                 </li>
                                             </ul>
@@ -124,6 +120,7 @@ if (isset($_GET['delete_repstd'])) {
     $(document).on('click', '.delete_checkin', function() {
         var id = $(this).attr("id");
         var name_std = $(this).attr("data-name-std");
+        var name_img = $(this).attr("data-name-img");
         swal.fire({
             title: 'ต้องการนำรายชื่อนี้ออก !',
             text: "ชื่อนักศึกษา : " + name_std,
@@ -135,7 +132,7 @@ if (isset($_GET['delete_repstd'])) {
             cancelButtonText: 'no'
         }).then((result) => {
             if (result.value) {
-                window.location.href = "?page=report_detail&delete_repstd=" + id +"&repid=<?= $repid ?>";
+                window.location.href = "?page=report_detail&delete_repstd=" + id + "&repid=<?= $repid ?>"+ "&subid=<?= $subid ?>";
             }
         });
     });
@@ -154,7 +151,7 @@ if (isset($_GET['delete_repstd'])) {
                     var jsonData = JSON.parse(response);
                     if (jsonData.success == "1") {
 
-                        $('#result1').attr("src","upload/img_student/"+jsonData.result1);
+                        $('#result1').attr("src", "upload/img_student/" + jsonData.result1);
                         $('#result2').html(jsonData.result2);
                         $('#result3').html(jsonData.result3);
                         $('#result4').html(jsonData.result4);

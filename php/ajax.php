@@ -57,10 +57,11 @@ if (isset($_POST['timestart']) && isset($_POST['subid'])) {
 }
 
 if (
-	isset($_POST['std_checkin']) && isset($_POST['std_checkin']) &&
-	isset($_POST['sub_checkin']) && isset($_POST['time_checkin'])
+	isset($_POST['cr_checkin']) && isset($_POST['std_checkin']) &&
+	isset($_POST['sub_checkin']) && isset($_POST['time_checkin']) &&
+	isset($_POST['capimg'])
 ) {
-
+	$capimg = $_POST['capimg'];
 	$cr_checkin = $_POST['cr_checkin'];
 	$std_checkin = $_POST['std_checkin'];
 	$sub_checkin = $_POST['sub_checkin'];
@@ -74,24 +75,45 @@ if (
 
 		if (!$checkstd) {
 
-			$checkin = $lms->insert('checkin', ["id_croom" => $cr_checkin, "id_sub" => $sub_checkin, "id_std" => $std_checkin, "ctime" => $time_checkin]);
+			// $uploadpath   = '../upload/img_checkin/';
+			// $parts        = explode(";base64,", $capimg);
+			// $imageparts   = explode("image/", @$parts[0]);
+			// $imagetype    = $imageparts[1];
+			// $imagebase64  = base64_decode($parts[1]);
+			// $nameimg      = $cr_checkin . '-' . $std_checkin . '.png';
+			// $file         = $uploadpath . $nameimg;
 
-			if ($checkin) {
+			// if (file_put_contents($file, $imagebase64)) {
 
-				//$resultck = $lms->select('student s JOIN checkin c  ON s.id = c.id_std', "std_id,prefix,fname,lname", "c.id_croom ='$cr_checkin'");
+				$checkin = $lms->insert('checkin', ["id_croom" => $cr_checkin, "id_sub" => $sub_checkin, "id_std" => $std_checkin, "ctime" => $time_checkin, "img_check" => $capimg]);
 
-				$resultck = $lms->select('student s JOIN checkin c  ON s.id = c.id_std', "std_id,prefix,fname,lname", "c.id_croom ='$cr_checkin' AND s.id = '$std_checkin'");
+				if ($checkin) {
 
-				echo json_encode(array(
-					'success' => 1,
-					'resultck1' => $resultck[0]['std_id'],
-					'resultck2' => $resultck[0]['prefix'],
-					'resultck3' => $resultck[0]['fname'],
-					'resultck4' => $resultck[0]['lname'],
-				));
-			} else {
-				echo json_encode(array('success' => 2));
-			}
+					//$resultck = $lms->select('student s JOIN checkin c  ON s.id = c.id_std', "std_id,prefix,fname,lname", "c.id_croom ='$cr_checkin'");
+
+					$resultck = $lms->select('student s JOIN checkin c  ON s.id = c.id_std', "std_id,prefix,fname,lname", "c.id_croom ='$cr_checkin' AND s.id = '$std_checkin'");
+
+					echo json_encode(array(
+						'success' => 1,
+						'resultck1' => $resultck[0]['std_id'],
+						'resultck2' => $resultck[0]['prefix'],
+						'resultck3' => $resultck[0]['fname'],
+						'resultck4' => $resultck[0]['lname'],
+					));
+				} else {
+
+					if (file_exists($file)) {
+						unlink($file);
+					}
+					echo json_encode(array('success' => 2));
+				}
+			// } else {
+
+			// 	if (file_exists($file)) {
+			// 		unlink($file);
+			// 	}
+			// 	echo json_encode(array('success' => 2));
+			// }
 		} else {
 			echo json_encode(array('success' => 2));
 		}
