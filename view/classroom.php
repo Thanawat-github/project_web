@@ -10,6 +10,12 @@ if (!isset($_SESSION['id_teacher'])) {
 if (isset($_GET['subid'])) {
 
   $subid = $_GET['subid'];
+
+  $idinclass = $lms->select('sub_std', "id_student", "id_subject='$subid'");
+  $idinc = array();
+  foreach ($idinclass as $value) {
+    $idinc[] = $value['id_student'];
+  }
 } else {
 
   $_SESSION['error'] = "เกิดข้อผิดพลาด! ไม่พบข้อมูล!";
@@ -239,13 +245,20 @@ if (isset($_GET['subid'])) {
 
   // Create Face Matcher
   async function createFaceMatcher(data) {
+    var idinc = <?= json_encode($idinc) ?>;
+
     const labeledFaceDescriptors = await Promise.all(data.parent.map(className => {
       const descriptors = [];
       for (var i = 0; i < className._descriptors.length; i++) {
         descriptors.push(className._descriptors[i]);
       }
-      lalabel = className._label;
-      return new faceapi.LabeledFaceDescriptors(lalabel, descriptors);
+      if (idinc.includes(className.std_id)) {
+        label = className._label;
+      } else {
+        label = 'unknown';
+      }
+      return new faceapi.LabeledFaceDescriptors(label, descriptors);
+
     }))
     return new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6);
   }
@@ -323,7 +336,7 @@ if (isset($_GET['subid'])) {
                     std_checkin: dtf[index].std_id,
                     sub_checkin: subid,
                     time_checkin: '<?= $date ?>',
-                    capimg:capURL
+                    capimg: capURL
                   },
                   success: function(response) {
                     var jsonData = JSON.parse(response);

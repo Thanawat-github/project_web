@@ -23,16 +23,21 @@
     //     //console.log(i)
     // }
 
-    var filtered = data.filter(a => a.Name == "user");
-    console.log(filtered);
+    // var filtered = data.filter(a => a.Name == "user");
+    // console.log(filtered);
 
-    data.filter(function(item,index){
-      if(item.Name == "user"){
-        console.log(data[index].dec) ;
-        return false;
-      }  
-    });
+    // data.filter(function(item,index){
+    //   if(item.Name == "user"){
+    //     console.log(data[index].dec) ;
+    //     return false;
+    //   }  
+    // });
 
+    var yyy = data[0].dec.includes('123');
+    console.log(yyy) ;
+    if(yyy){
+      console.log('yes') ;
+    }
     
     
 
