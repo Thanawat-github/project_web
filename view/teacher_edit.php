@@ -248,12 +248,16 @@
                     $en_pwd = $lms->encode($del_password);
 
                     $check_del = $lms->select('teacher',"*","id='$id_teacher'AND username='$del_username' AND password='$en_pwd'");
-                    
+                    $delpath = $check_del[0]['profile'];
                     if(!empty($check_del)) {
                                 
                         $del_account = $lms->delete('teacher',"id='$id_teacher'");
                         
                         if(!empty($del_account)) {
+
+                            if (file_exists('upload/img_teacher/'.$delpath)) {
+                                unlink('upload/img_teacher/'.$delpath);
+                            }
                                 
                             $_SESSION['success'] = "ลบบัญชีสำเร็จ!";
                             echo "<script>window.location.href='auth/login.php';</script>";

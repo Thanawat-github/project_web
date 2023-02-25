@@ -126,7 +126,9 @@ if (isset($_GET['subid'])) {
     onPlay();
     //myTimeout = setInterval(()=>onPlay());
     var subid = $("#subid").val();
-
+    $(".trclear").remove();
+    $("#log_name").html('');
+    $("#prof_img").attr('src', '');
 
     $.ajax({
       type: "POST",
@@ -142,6 +144,7 @@ if (isset($_GET['subid'])) {
           $("#last_id").val(jsonData.last_id);
           totalSeconds = 0;
           timerVar = setInterval(countTimer, 1000);
+          cap5min = setInterval(capeve5, 10000);
         }
       }
     });
@@ -156,6 +159,7 @@ if (isset($_GET['subid'])) {
 
     callagain = false;
     clearInterval(timerVar);
+    clearInterval(cap5min);
     //clearInterval(myTimeout);
 
     var last_id = $("#last_id").val();
@@ -275,6 +279,41 @@ if (isset($_GET['subid'])) {
     return resultt;
   }
 
+  function capeve5() {
+    console.log("running")
+
+    var video5 = document.getElementById('vidDisplay');
+    var capimg5 = document.createElement('canvas');
+    var context5 = capimg5.getContext('2d');
+    context5.drawImage(video5, 0, 0, 200, 150);
+    var capURL5 = capimg5.toDataURL('image/png');
+    var subid = $("#subid").val();
+    var last_id = $("#last_id").val();
+
+    $.ajax({
+      type: "POST",
+      url: "http://localhost/project_web/php/ajax.php",
+      data: {
+        cr_cap: last_id,
+        sub_cap: subid,
+        capimg5: capURL5
+      },
+      success: function(response) {
+        var jsonData = JSON.parse(response);
+        if (jsonData.success == "1") {
+          console.log("capture every 5 min")
+
+        }else if(jsonData.success == "2"){
+          console.log("capture every 2")
+        }else if(jsonData.success == "3"){
+          console.log("capture every 3")
+        }else if(jsonData.success == "4"){
+          console.log("capture every 4")
+        }
+      }
+    });
+  }
+
   //var dataFetch = undefined;
   var dataFetch = undefined;
   //asyncCall();
@@ -342,7 +381,7 @@ if (isset($_GET['subid'])) {
                     var jsonData = JSON.parse(response);
                     if (jsonData.success == "1") {
                       $('#exerow').remove();
-                      $('#checkinTable').append(`<tr><td>${jsonData.resultck1}</td><td>${jsonData.resultck2}</td><td>${jsonData.resultck3}</td><td>${jsonData.resultck4}</td></tr>`);
+                      $('#checkinTable').append(`<tr class="trclear"><td>${jsonData.resultck1}</td><td>${jsonData.resultck2}</td><td>${jsonData.resultck3}</td><td>${jsonData.resultck4}</td></tr>`);
 
                       // $('#result1').attr("src", "upload/img_student/" + jsonData.result1);
                       // $('#result2').html(jsonData.result2);

@@ -29,9 +29,15 @@
     if(isset($_GET['delete_subject'])){
         
         $id = $_GET['delete_subject'];
+        $oldpath = $lms->select('subject','image',"id='$id'");
+        $delpath = $oldpath[0]['image'];
         $del_std = $lms->delete('subject',"id='$id'");
 
         if(!empty($del_std)) {
+
+            if (file_exists('upload/img_subject/'.$delpath)) {
+				unlink('upload/img_subject/'.$delpath);
+			}
                                     
             $_SESSION['success'] = "ลบรายวิชานี้สำเร็จ!";
             echo "<script>window.history.back();</script>";

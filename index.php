@@ -92,6 +92,10 @@ include("inc/navbar.php");
             case "report_detail":
                 include("view/report_detail.php");
                 break;
+
+            case "report_img":
+                include("view/report_img.php");
+                break;
             
             default:
             include("view/subject_list.php");
@@ -104,4 +108,3 @@ include("inc/navbar.php");
     }
 
 include("inc/footer.php");
-?>

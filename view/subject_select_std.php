@@ -50,11 +50,17 @@
         }  
         
         $delid = $_GET['delete_student'];
+        $oldpath = $lms->select('student','std_pic',"id='$id'");
+        $delpath = $oldpath[0]['std_pic'];
         $del_std = $lms->delete('student',"id='$delid'");
 
         if(!empty($del_std)) {
                                     
             $_SESSION['success'] = "ลบรายชื่อนี้สำเร็จ!";
+
+            if (file_exists('upload/img_student/'.$delpath)) {
+				unlink('upload/img_student/'.$delpath);
+			}
             
             $json = file_get_contents('data/neural.json');
             $decoded = json_decode($json, true);

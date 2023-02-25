@@ -18,7 +18,7 @@ if (isset($_GET['repid']) && isset($_GET['subid'])) {
     exit;
 }
 
-if (isset($_GET['delete_repstd']) && isset($_GET['delimg'])) {
+if (isset($_GET['delete_repstd'])) {
 
     $delete_repstd = $_GET['delete_repstd'];
     $del_repstd = $lms->delete('checkin', "id='$delete_repstd'");

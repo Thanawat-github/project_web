@@ -1,6 +1,9 @@
 <?php
 include("function.php");
 $lms = new lms();
+date_default_timezone_set('Asia/Bangkok');
+$date = date("Y-m-d H:i:s");
+$namedate = date("YmdHis");
 
 // if(isset($_POST['path'])&&isset($_POST['image'])){
 // 	$path = $_POST['path'];
@@ -85,35 +88,25 @@ if (
 
 			// if (file_put_contents($file, $imagebase64)) {
 
-				$checkin = $lms->insert('checkin', ["id_croom" => $cr_checkin, "id_sub" => $sub_checkin, "id_std" => $std_checkin, "ctime" => $time_checkin, "img_check" => $capimg]);
+			$checkin = $lms->insert('checkin', ["id_croom" => $cr_checkin, "id_sub" => $sub_checkin, "id_std" => $std_checkin, "ctime" => $time_checkin, "img_check" => $capimg]);
 
-				if ($checkin) {
+			if ($checkin) {
 
-					//$resultck = $lms->select('student s JOIN checkin c  ON s.id = c.id_std', "std_id,prefix,fname,lname", "c.id_croom ='$cr_checkin'");
+				//$resultck = $lms->select('student s JOIN checkin c  ON s.id = c.id_std', "std_id,prefix,fname,lname", "c.id_croom ='$cr_checkin'");
 
-					$resultck = $lms->select('student s JOIN checkin c  ON s.id = c.id_std', "std_id,prefix,fname,lname", "c.id_croom ='$cr_checkin' AND s.id = '$std_checkin'");
+				$resultck = $lms->select('student s JOIN checkin c  ON s.id = c.id_std', "std_id,prefix,fname,lname", "c.id_croom ='$cr_checkin' AND s.id = '$std_checkin'");
 
-					echo json_encode(array(
-						'success' => 1,
-						'resultck1' => $resultck[0]['std_id'],
-						'resultck2' => $resultck[0]['prefix'],
-						'resultck3' => $resultck[0]['fname'],
-						'resultck4' => $resultck[0]['lname'],
-					));
-				} else {
+				echo json_encode(array(
+					'success' => 1,
+					'resultck1' => $resultck[0]['std_id'],
+					'resultck2' => $resultck[0]['prefix'],
+					'resultck3' => $resultck[0]['fname'],
+					'resultck4' => $resultck[0]['lname'],
+				));
+			} else {
 
-					if (file_exists($file)) {
-						unlink($file);
-					}
-					echo json_encode(array('success' => 2));
-				}
-			// } else {
-
-			// 	if (file_exists($file)) {
-			// 		unlink($file);
-			// 	}
-			// 	echo json_encode(array('success' => 2));
-			// }
+				echo json_encode(array('success' => 2));
+			}
 		} else {
 			echo json_encode(array('success' => 2));
 		}
@@ -134,5 +127,49 @@ if (isset($_POST['timestop']) && isset($_POST['thisid']) && isset($_POST['totalt
 		echo json_encode(array('success' => 1));
 	} else {
 		echo json_encode(array('success' => 2));
+	}
+}
+
+if (
+	isset($_POST['cr_cap']) && isset($_POST['sub_cap']) &&
+	isset($_POST['capimg5'])
+) {
+	$capimg5 = $_POST['capimg5'];
+	$cr_cap = $_POST['cr_cap'];
+	$sub_cap = $_POST['sub_cap'];
+
+	$uploadpath   = '../upload/img_cap5min/';
+	$parts        = explode(";base64,", $capimg5);
+	$imageparts   = explode("image/", @$parts[0]);
+	$imagetype    = $imageparts[1];
+	$imagebase64  = base64_decode($parts[1]);
+	$nameimg      = $sub_cap . '-' . $cr_cap . "-" . $namedate . '.png';
+	$file         = $uploadpath . $nameimg;
+
+	$checkimg = $lms->select('checkcap', "*", "path_cap='$nameimg'");
+
+	if (!$checkimg) {
+
+		if (file_put_contents($file, $imagebase64)) {
+
+			$cap5min = $lms->insert('checkcap', ["id_sub" => $sub_cap, "id_croom" => $cr_cap, "time_cap" => $date, "path_cap" => $nameimg]);
+
+			if ($cap5min) {
+
+				echo json_encode(array(
+					'success' => 1
+				));
+			} else {
+
+				if (file_exists($file)) {
+					unlink($file);
+				}
+				echo json_encode(array('success' => 2));
+			}
+		} else {
+			echo json_encode(array('success' => 3));
+		}
+	} else {
+		echo json_encode(array('success' => 4));
 	}
 }
