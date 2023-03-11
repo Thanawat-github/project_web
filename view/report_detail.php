@@ -72,10 +72,10 @@ if (isset($_GET['delete_repstd'])) {
                             $reportdt_page = $lms->select('student s JOIN checkin c  ON s.id = c.id_std', 'img_check,ctime,c.id as thisid,id_std,std_id,prefix,fname,lname', "c.id_croom ='$repid'");
                             foreach ($reportdt_page as $reportdt_list) {
                             ?>
-                                <tr>
+                                <tr style="vertical-align:middle;">
                                     <td>
                                         <div width="100" height="75" style="overflow:hidden;">
-                                            <img src="<?= $reportdt_list['img_check'] ?>" width="150" height="75">
+                                            <img src="<?= $reportdt_list['img_check'] ?>" width="100" height="75">
                                         </div>
                                     </td>
                                     <td>

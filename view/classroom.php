@@ -24,6 +24,8 @@ if (isset($_GET['subid'])) {
 }
 
 ?>
+<!-- <script src="build/tracking-min.js"></script>
+<script src="build/data/eye-min.js"></script> -->
 <style>
   .spinner-wrapper {
     background-color: #000;
@@ -43,7 +45,6 @@ if (isset($_GET['subid'])) {
     width: 60px;
   }
 </style>
-
 <div class="spinner-wrapper text-primary" id="loadp">
   <div class="spinner-border" role="status">
     <span class="visually-hidden">Loading...</span>
@@ -55,7 +56,8 @@ if (isset($_GET['subid'])) {
   <div class="margin" style="position: relative; float:center; margin: 50px 0px 0px 30px;">
     <video id="vidDisplay" style="width: 800px; height: 600px; display: inline-block; 
     vertical-align: baseline; border: 3px solid black;" autoplay="true"></video>
-    <canvas id="overlay" style="position: absolute; top: 0; left: 0;" width="800" height="600" />
+    <canvas id="overlay" style="position: absolute; top: 0; left: 0;" width="800" height="600"></canvas>
+    <!-- <canvas id="overlay2" style="position: absolute; top: 0; left: 0;" width="800" height="600"></canvas> -->
   </div>
 
   <div id="parent2" style="margin:50px 0 0 30px;" class="col-sm-5">
@@ -144,7 +146,7 @@ if (isset($_GET['subid'])) {
           $("#last_id").val(jsonData.last_id);
           totalSeconds = 0;
           timerVar = setInterval(countTimer, 1000);
-          cap5min = setInterval(capeve5, 10000);
+          cap5min = setInterval(capeve5, 5000);
         }
       }
     });
@@ -285,8 +287,11 @@ if (isset($_GET['subid'])) {
     var video5 = document.getElementById('vidDisplay');
     var capimg5 = document.createElement('canvas');
     var context5 = capimg5.getContext('2d');
-    context5.drawImage(video5, 0, 0, 200, 150);
+    capimg5.width = 700;
+    capimg5.height = 525;
+    context5.drawImage(video5, 0, 0, 700, 525);
     var capURL5 = capimg5.toDataURL('image/png');
+    console.log(capURL5);
     var subid = $("#subid").val();
     var last_id = $("#last_id").val();
 
@@ -303,12 +308,8 @@ if (isset($_GET['subid'])) {
         if (jsonData.success == "1") {
           console.log("capture every 5 min")
 
-        }else if(jsonData.success == "2"){
-          console.log("capture every 2")
-        }else if(jsonData.success == "3"){
-          console.log("capture every 3")
-        }else if(jsonData.success == "4"){
-          console.log("capture every 4")
+        } else {
+          console.log("capture every " + jsonData.success)
         }
       }
     });
@@ -328,14 +329,12 @@ if (isset($_GET['subid'])) {
     if (videoEl.paused || videoEl.ended) {
       setTimeout(() => onPlay())
     }
-    $("#overlay").show()
+    $("#overlay").show();
+    //$("#overlay2").show();
     const canvas = $('#overlay').get(0)
-    var video = document.getElementById('vidDisplay');
-    var capimg = document.createElement('canvas');
-    var context = capimg.getContext('2d');
-    context.drawImage(video, 0, 0, 200, 150);
-    var capURL = capimg.toDataURL('image/png');
-
+    //const canvas2 = $('#overlay2').get(0)
+    // var contxt = canvas2.getContext('2d');
+    // contxt.clearRect(0, 0, canvas.width, canvas.height);
     if (faceMatcher != undefined) {
       //--------------------------FACE RECOGNIZE------------------
       const input = document.getElementById('vidDisplay')
@@ -344,6 +343,7 @@ if (isset($_GET['subid'])) {
         height: 600
       }
       faceapi.matchDimensions(canvas, displaySize)
+      //const eyee = await faceapi.detectSingleFace(input).withFaceLandmarks()
       const detections = await faceapi.detectAllFaces(input).withFaceLandmarks().withFaceDescriptors()
       const resizedDetections = faceapi.resizeResults(detections, displaySize)
       const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor))
@@ -361,6 +361,56 @@ if (isset($_GET['subid'])) {
 
         if (str != "unknown") {
           if (rating > 0.35) {
+
+            var capimg = document.createElement('canvas');
+            var context = capimg.getContext('2d');
+            capimg.width = 200;
+            capimg.height = 150;
+            context.drawImage(input, 0, 0, 200, 150);
+            var capURL = capimg.toDataURL('image/png');
+            console.log(capURL);
+
+            // var tracker = new tracking.ObjectTracker(['eye']);
+            // tracker.setStepSize(1.7);
+            // tracking.track('#vidDisplay', tracker);
+            // tracking.run();
+            // tracker.on('track', function(event) {
+            //   contxt.clearRect(0, 0, canvas.width, canvas.height);
+            //   event.data.forEach(function(rect) {
+            //     window.plot(rect.x, rect.y, rect.width, rect.height);
+            //   });
+            //   if (debug) console.log(event);
+            // setTimeout(() => {
+            //   tracking.stop();
+            // }, 100);
+            // });
+
+            // window.plot = function(x, y, w, h) {
+            //   contxt.strokeRect(x, y, w, h);
+            // };
+            // contxt.clearRect(0, 0, canvas.width, canvas.height);
+
+
+            // if (eyee) {
+            //   console.log("Left Eye landmarks===========>" + JSON.stringify(eyee.landmarks.getLeftEye()));
+            //   var lefte = eyee.landmarks.getLeftEye();
+            //   console.log("Right Eye landmarks===========>" + JSON.stringify(eyee.landmarks.getRightEye()));
+            //   var righte = eyee.landmarks.getRightEye();
+            //   console.log('left')
+            //   var leftx = lefte.map(lefte => lefte._x).reduce((acc, amount) => acc + amount);
+            //   console.log(leftx / 6)
+
+            //   var lefty = lefte.map(lefte => lefte._y).reduce((acc, amount) => acc + amount);
+            //   console.log(lefty / 6)
+            //   console.log('right')
+            //   var rightx = righte.map(righte => righte._x).reduce((acc, amount) => acc + amount);
+            //   console.log(rightx / 6)
+
+            //   var righty = righte.map(righte => righte._y).reduce((acc, amount) => acc + amount);
+            //   console.log(righty / 6)
+            // } else {
+            //   console.log("nodetect eye");
+            // }
             console.log("Match TRUE!")
             dtf.filter(function(item, index) {
               if (item._label == str) {
@@ -453,6 +503,7 @@ if (isset($_GET['subid'])) {
       setTimeout(() => onPlay());
     } else {
       $("#overlay").hide()
+      $("#overlay2").hide()
     }
   }
 

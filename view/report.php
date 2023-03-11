@@ -90,9 +90,11 @@ if (isset($_GET['delete_report'])) {
                                             <button type="button" class="btn btn-dark dropdown-toggle px-2 px-md-4" data-bs-toggle="dropdown" aria-expanded="false"><b>เลือก</b>
                                             </button>
                                             <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="?page=report_detail&repid=<?= $report_list['id'] ?>&subid=<?= $subid ?>">view</a>
+                                                <li><a class="dropdown-item" href="?page=report_detail&repid=<?= $report_list['id'] ?>&subid=<?= $subid ?>">view student</a>
                                                 </li>
                                                 <li><a class="dropdown-item" href="?page=report_img&repid=<?= $report_list['id'] ?>&subid=<?= $subid ?>">view image</a>
+                                                </li>
+                                                <li><a class="dropdown-item" href="?page=report_graph&repid=<?= $report_list['id'] ?>&subid=<?= $subid ?>">view graph</a>
                                                 </li>
                                                 <li><a class="dropdown-item delete_student" id="<?= $report_list['id'] ?>">delete</a>
                                                 </li>

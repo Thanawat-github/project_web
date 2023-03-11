@@ -125,7 +125,7 @@
                                     $student_page = $lms->select("student LEFT JOIN sub_std ON student.id = sub_std.id_student AND sub_std.id_subject = '$subid'",'student.*','sub_std.id_student IS NULL');
                                     foreach($student_page as $student_list){ 
                                     ?>
-                            <tr>
+                            <tr style="vertical-align:middle;">
                                 <td>
                                     <img src=" upload/img_student/<?= $student_list['std_pic'] ?>"
                                         style=" width: 100px; height: 100px; object-fit: cover;">
