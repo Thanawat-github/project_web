@@ -7,14 +7,21 @@ if (!isset($_SESSION['id_teacher'])) {
     exit;
 }
 
-if (isset($_GET['subid'])) {
+if (isset($_GET['repid']) && isset($_GET['subid'])) {
 
+    $repid = $_GET['repid'];
     $subid = $_GET['subid'];
 
     $idinclass = $lms->select('sub_std', "id_student", "id_subject='$subid'");
     $idinc = array();
     foreach ($idinclass as $value) {
         $idinc[] = $value['id_student'];
+    }
+    $numstd = $lms->select('sub_std', "count(*) as numstd", "id_subject='$subid'");
+    $time_cap = $lms->select("checkcap", "time_cap", "id_croom='$repid'");
+    $tcap = array();
+    foreach ($time_cap as $val) {
+        $tcap[] = $val['time_cap'];
     }
 } else {
 
@@ -43,6 +50,7 @@ if (isset($_GET['subid'])) {
         width: 60px;
     }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div class="spinner-wrapper text-primary" id="loadp">
     <div class="spinner-border" role="status">
         <span class="visually-hidden">Loading...</span>
@@ -70,11 +78,16 @@ if (isset($_GET['subid'])) {
             <div class="row">
                 <div class="col-lg-12">
                     <div class="main-box clearfix">
-                        <div id="parent1" style="display:flex;background-color:#f0f8ff;min-height:740px;">
-                            <div class="margin" style="position: relative; float:center; margin: 50px 0px 0px 30px;">
-                                <image id="imgDisplay" style="width: 750; height: 525;" src="upload/img_cap5min/29-155-20230312021935.png">
-                                    <canvas id="overlay" style="position: absolute; top: 0; left: 0;" width="750" height="525" /></div>
-                        </div>
+                        <?php
+                        $report_graph = $lms->select("checkcap", "*", "id_croom='$repid'");
+                        $numindex = 0;
+                        foreach ($report_graph as $rep_graph) {
+                            $numindex++;
+                        ?>
+                            <image id="imgDisplay<?= $numindex; ?>" style="width: 700; height: 525; display:none;" src="upload/img_cap5min/<?= $rep_graph['path_cap']; ?>" />
+                            <!-- <canvas id="overlay" style="position: absolute; top: 0; left: 0;" width="700" height="525" /> -->
+                        <?php } ?>
+                        <canvas id="myChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -82,6 +95,14 @@ if (isset($_GET['subid'])) {
     </div>
 </div>
 <script>
+    var dataFetch = undefined;
+    var student_total = [];
+    var cap_total = [];
+    var time_cap = <?= json_encode($tcap) ?>;
+    console.log(time_cap);
+    var numindex = <?= $numindex; ?>;
+    var ix = 1;
+
     $('#loadp').show();
     Promise.all([
         faceapi.nets.faceRecognitionNet.loadFromUri('/project_web/data/models'),
@@ -107,8 +128,38 @@ if (isset($_GET['subid'])) {
                 }
                 faceMatcher = await createFaceMatcher(content);
             }
+            if (dataFetch == undefined) {
+                dataFetch = await dtfetch();
+            }
+            var dtf = JSON.parse(dataFetch);
+            await numimg();
+            console.log(student_total);
+
             $('#loadp').hide();
-            onPlay();
+            const ctx = document.getElementById('myChart');
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: cap_total,
+                    datasets: [{
+                        label: 'จำนวนนักเรียนที่เรียน',
+                        data: student_total,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            max: <?= $numstd[0]['numstd']; ?>
+                        }
+                    },
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            });
+
         });
     }
 
@@ -143,44 +194,59 @@ if (isset($_GET['subid'])) {
         return resultt;
     }
 
-    var dataFetch = undefined;
-    //asyncCall();
-    async function onPlay() {
+    async function numimg() {
 
-        if (dataFetch == undefined) {
-            dataFetch = await dtfetch();
+        for (ix; ix <= numindex; ix++) {
+            cap_total[ix - 1] = 'นาทีที่ : ' + (5 * ix)+" เวลา : "+time_cap[ix-1];
+            await onPlay();
         }
-        var dtf = JSON.parse(dataFetch);
+    }
 
-        $("#overlay").show();
-        const canvas = $('#overlay').get(0)
+    async function onPlay() {
+        console.log('this round ' + ix);
+        var std_total = 0;
+
+        // if (dataFetch == undefined) {
+        //     dataFetch = await dtfetch();
+        // }
+        // var dtf = JSON.parse(dataFetch);
+
+        //$("#overlay").show();
+        //const canvas = $('#overlay').get(0)
 
         if (faceMatcher != undefined) {
             //--------------------------FACE RECOGNIZE------------------
-            const input = document.getElementById('imgDisplay')
+            const input = $('#imgDisplay' + ix).get(0);
             const displaySize = {
-                width: 750,
+                width: 700,
                 height: 525
             }
-            faceapi.matchDimensions(canvas, displaySize)
-            const detections = await faceapi.detectAllFaces(input).withFaceLandmarks().withFaceDescriptors()
-            const resizedDetections = faceapi.resizeResults(detections, displaySize)
-            const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor))
-            console.log('111');
+            //faceapi.matchDimensions(canvas, displaySize);
+            const detections = await faceapi.detectAllFaces(input).withFaceLandmarks().withFaceDescriptors();
+            const resizedDetections = faceapi.resizeResults(detections, displaySize);
+            const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor));
             console.log(results);
-            results.forEach((result, i) => {
-                const box = resizedDetections[i].detection.box
-                const drawBox = new faceapi.draw.DrawBox(box, {
-                    label: result.toString()
-                })
-                drawBox.draw(canvas)
-                console.log(result.toString())
-                var str = result.toString()
-                rating = parseFloat(str.substring(str.indexOf('(') + 1, str.indexOf(')')))
-                str = str.substring(0, str.indexOf('('))
-                str = str.substring(0, str.length - 1)
+            if (results.length > 1) {
+                results.forEach((result, i) => {
+                    // const box = resizedDetections[i].detection.box;
+                    // const drawBox = new faceapi.draw.DrawBox(box, {
+                    //     label: result.toString()
+                    // });
+                    // drawBox.draw(canvas);
+                    console.log(result.toString());
+                    var str = result.toString();
+                    rating = parseFloat(str.substring(str.indexOf('(') + 1, str.indexOf(')')));
+                    str = str.substring(0, str.indexOf('('));
+                    str = str.substring(0, str.length - 1);
+                    if (str != "unknown") {
+                        std_total++;
+                    }
 
-            });
+                });
+            } else {
+                console.log('no detect')
+            }
         }
+        student_total[ix - 1] = std_total
     }
 </script>

@@ -124,7 +124,7 @@ function paginationimg($table,$rows="*",$where = null,$page_rows=10,$repid,$subi
         </div>
         <div class="px-5 py-4 bg-light rounded-5 shadow-lg">
             <div class="row">
-                <div class="col-lg-12">
+                <div class="col-lg-12 p-0">
                     <div class="main-box clearfix">
                         <div class=" row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
                             <?php
@@ -134,7 +134,7 @@ function paginationimg($table,$rows="*",$where = null,$page_rows=10,$repid,$subi
                                 <div class="col">
                                     <div class="card shadow-sm" style="overflow:hidden;">
                                         <div width="400" height="300" style="overflow:hidden;">
-                                            <img src="upload/img_cap5min/<?= $repimg_list['path_cap'] ?>" style="width: 400px; height: 300px; ">
+                                            <img src="upload/img_cap5min/<?= $repimg_list['path_cap'] ?>" class="img-fluid">
                                         </div>
                                         <div class="card-body" style="height: 90px;">
                                             <h6 class="card-text fw-bold" style="height:20px;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">

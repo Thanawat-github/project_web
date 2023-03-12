@@ -368,7 +368,6 @@ if (isset($_GET['subid'])) {
             capimg.height = 150;
             context.drawImage(input, 0, 0, 200, 150);
             var capURL = capimg.toDataURL('image/png');
-            console.log(capURL);
 
             // var tracker = new tracking.ObjectTracker(['eye']);
             // tracker.setStepSize(1.7);
