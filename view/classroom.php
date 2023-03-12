@@ -344,11 +344,111 @@ if (isset($_GET['subid'])) {
       }
       faceapi.matchDimensions(canvas, displaySize)
       //const eyee = await faceapi.detectSingleFace(input).withFaceLandmarks()
-      const detections = await faceapi.detectAllFaces(input).withFaceLandmarks().withFaceDescriptors()
-      const resizedDetections = faceapi.resizeResults(detections, displaySize)
-      const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor))
-      results.forEach((result, i) => {
-        const box = resizedDetections[i].detection.box
+      // const detections = await faceapi.detectAllFaces(input).withFaceLandmarks().withFaceDescriptors()
+      // const resizedDetections = faceapi.resizeResults(detections, displaySize)
+      // const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor))
+      // results.forEach((result, i) => {
+      //   const box = resizedDetections[i].detection.box
+      //   const drawBox = new faceapi.draw.DrawBox(box, {
+      //     label: result.toString()
+      //   })
+      //   drawBox.draw(canvas)
+      //   console.log(result.toString())
+      //   var str = result.toString()
+      //   rating = parseFloat(str.substring(str.indexOf('(') + 1, str.indexOf(')')))
+      //   str = str.substring(0, str.indexOf('('))
+      //   str = str.substring(0, str.length - 1)
+
+      //   if (str != "unknown") {
+      //     if (rating > 0.35) {
+
+      //       var capimg = document.createElement('canvas');
+      //       var context = capimg.getContext('2d');
+      //       capimg.width = 200;
+      //       capimg.height = 150;
+      //       context.drawImage(input, 0, 0, 200, 150);
+      //       var capURL = capimg.toDataURL('image/png');
+
+      //       // var tracker = new tracking.ObjectTracker(['eye']);
+      //       // tracker.setStepSize(1.7);
+      //       // tracking.track('#vidDisplay', tracker);
+      //       // tracking.run();
+      //       // tracker.on('track', function(event) {
+      //       //   contxt.clearRect(0, 0, canvas.width, canvas.height);
+      //       //   event.data.forEach(function(rect) {
+      //       //     window.plot(rect.x, rect.y, rect.width, rect.height);
+      //       //   });
+      //       //   if (debug) console.log(event);
+      //       // setTimeout(() => {
+      //       //   tracking.stop();
+      //       // }, 100);
+      //       // });
+
+      //       // window.plot = function(x, y, w, h) {
+      //       //   contxt.strokeRect(x, y, w, h);
+      //       // };
+      //       // contxt.clearRect(0, 0, canvas.width, canvas.height);
+
+
+      //       // if (eyee) {
+      //       //   console.log("Left Eye landmarks===========>" + JSON.stringify(eyee.landmarks.getLeftEye()));
+      //       //   var lefte = eyee.landmarks.getLeftEye();
+      //       //   console.log("Right Eye landmarks===========>" + JSON.stringify(eyee.landmarks.getRightEye()));
+      //       //   var righte = eyee.landmarks.getRightEye();
+      //       //   console.log('left')
+      //       //   var leftx = lefte.map(lefte => lefte._x).reduce((acc, amount) => acc + amount);
+      //       //   console.log(leftx / 6)
+
+      //       //   var lefty = lefte.map(lefte => lefte._y).reduce((acc, amount) => acc + amount);
+      //       //   console.log(lefty / 6)
+      //       //   console.log('right')
+      //       //   var rightx = righte.map(righte => righte._x).reduce((acc, amount) => acc + amount);
+      //       //   console.log(rightx / 6)
+
+      //       //   var righty = righte.map(righte => righte._y).reduce((acc, amount) => acc + amount);
+      //       //   console.log(righty / 6)
+      //       // } else {
+      //       //   console.log("nodetect eye");
+      //       // }
+      //       console.log("Match TRUE!")
+      //       dtf.filter(function(item, index) {
+      //         if (item._label == str) {
+      //           $("#prof_img").attr('src', dtf[index].imgpath);
+      //           var subid = $("#subid").val();
+      //           var last_id = $("#last_id").val();
+      //           $.ajax({
+      //             type: "POST",
+      //             url: "http://localhost/project_web/php/ajax.php",
+      //             data: {
+      //               cr_checkin: last_id,
+      //               std_checkin: dtf[index].std_id,
+      //               sub_checkin: subid,
+      //               time_checkin: '<?= $date ?>',
+      //               capimg: capURL
+      //             },
+      //             success: function(response) {
+      //               var jsonData = JSON.parse(response);
+      //               if (jsonData.success == "1") {
+      //                 $('#exerow').remove();
+      //                 $('#checkinTable').append(`<tr class="trclear"><td>${jsonData.resultck1}</td><td>${jsonData.resultck2}</td><td>${jsonData.resultck3}</td><td>${jsonData.resultck4}</td></tr>`);
+
+      //               }
+      //             }
+      //           });
+      //         }
+      //       });
+      //       $("#log_name").html(str);
+      //     }
+      //   }
+      // });
+
+      const detection = await faceapi.detectSingleFace(input).withFaceLandmarks().withFaceDescriptor()
+
+      if (detection) {
+
+        const resizedDetection = faceapi.resizeResults(detection, displaySize)
+        const result = faceMatcher.findBestMatch(detection.descriptor)
+        const box = resizedDetection.detection.box
         const drawBox = new faceapi.draw.DrawBox(box, {
           label: result.toString()
         })
@@ -368,48 +468,6 @@ if (isset($_GET['subid'])) {
             capimg.height = 150;
             context.drawImage(input, 0, 0, 200, 150);
             var capURL = capimg.toDataURL('image/png');
-
-            // var tracker = new tracking.ObjectTracker(['eye']);
-            // tracker.setStepSize(1.7);
-            // tracking.track('#vidDisplay', tracker);
-            // tracking.run();
-            // tracker.on('track', function(event) {
-            //   contxt.clearRect(0, 0, canvas.width, canvas.height);
-            //   event.data.forEach(function(rect) {
-            //     window.plot(rect.x, rect.y, rect.width, rect.height);
-            //   });
-            //   if (debug) console.log(event);
-            // setTimeout(() => {
-            //   tracking.stop();
-            // }, 100);
-            // });
-
-            // window.plot = function(x, y, w, h) {
-            //   contxt.strokeRect(x, y, w, h);
-            // };
-            // contxt.clearRect(0, 0, canvas.width, canvas.height);
-
-
-            // if (eyee) {
-            //   console.log("Left Eye landmarks===========>" + JSON.stringify(eyee.landmarks.getLeftEye()));
-            //   var lefte = eyee.landmarks.getLeftEye();
-            //   console.log("Right Eye landmarks===========>" + JSON.stringify(eyee.landmarks.getRightEye()));
-            //   var righte = eyee.landmarks.getRightEye();
-            //   console.log('left')
-            //   var leftx = lefte.map(lefte => lefte._x).reduce((acc, amount) => acc + amount);
-            //   console.log(leftx / 6)
-
-            //   var lefty = lefte.map(lefte => lefte._y).reduce((acc, amount) => acc + amount);
-            //   console.log(lefty / 6)
-            //   console.log('right')
-            //   var rightx = righte.map(righte => righte._x).reduce((acc, amount) => acc + amount);
-            //   console.log(rightx / 6)
-
-            //   var righty = righte.map(righte => righte._y).reduce((acc, amount) => acc + amount);
-            //   console.log(righty / 6)
-            // } else {
-            //   console.log("nodetect eye");
-            // }
             console.log("Match TRUE!")
             dtf.filter(function(item, index) {
               if (item._label == str) {
@@ -432,9 +490,6 @@ if (isset($_GET['subid'])) {
                       $('#exerow').remove();
                       $('#checkinTable').append(`<tr class="trclear"><td>${jsonData.resultck1}</td><td>${jsonData.resultck2}</td><td>${jsonData.resultck3}</td><td>${jsonData.resultck4}</td></tr>`);
 
-                      // $('#result1').attr("src", "upload/img_student/" + jsonData.result1);
-                      // $('#result2').html(jsonData.result2);
-
                     }
                   }
                 });
@@ -443,66 +498,14 @@ if (isset($_GET['subid'])) {
             $("#log_name").html(str);
           }
         }
-      });
-
-      // const detection = await faceapi.detectSingleFace(input).withFaceLandmarks().withFaceDescriptor()
-      // const resizedDetection = faceapi.resizeResults(detection, displaySize)
-      // const result = faceMatcher.findBestMatch(detection.descriptor)
-
-      // if (result) {
-
-      //   const box = resizedDetection.detection.box
-      //   const drawBox = new faceapi.draw.DrawBox(box, {
-      //     label: result.toString()
-      //   })
-      //   drawBox.draw(canvas)
-      //   console.log(result.toString())
-      //   var str = result.toString()
-      //   rating = parseFloat(str.substring(str.indexOf('(') + 1, str.indexOf(')')))
-      //   str = str.substring(0, str.indexOf('('))
-      //   str = str.substring(0, str.length - 1)
-
-      //   if (str != "unknown") {
-      //     if (rating > 0.5) {
-      //       console.log("Match TRUE!")
-      //       dtf.filter(function(item, index) {
-      //         if (item._label == str) {
-      //           $("#prof_img").attr('src', dtf[index].imgpath);
-      //           var subid = $("#subid").val();
-      //           var last_id = $("#last_id").val();
-      //           $.ajax({
-      //             type: "POST",
-      //             url: "http://localhost/project_web/php/ajax.php",
-      //             data: {
-      //               cr_checkin: last_id,
-      //               std_checkin: dtf[index].std_id,
-      //               sub_checkin: subid,
-      //               time_checkin: '<?= $date ?>'
-      //             },
-      //             success: function(response) {
-      //               var jsonData = JSON.parse(response);
-      //               if (jsonData.success == "1") {
-      //                 console.log(jsonData.resultck);
-      //                 // $('#result1').attr("src", "upload/img_student/" + jsonData.result1);
-      //                 // $('#result2').html(jsonData.result2);
-
-      //               }
-      //             }
-      //           });
-      //         }
-      //       });
-      //       $("#log_name").html(str)
-
-      //     }
-      //   }
-      // }
+      }
     }
 
     if (callagain) {
       setTimeout(() => onPlay());
     } else {
       $("#overlay").hide()
-      $("#overlay2").hide()
+      //$("#overlay2").hide()
     }
   }
 

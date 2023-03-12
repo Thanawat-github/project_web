@@ -1,6 +1,6 @@
 <?php
 if (isset($_GET['action']) && $_GET['action'] == 'logout') {
-    //$lms->delFileExit('img_cap5min');
+    $lms->delFileExit('img_cap5min');
     $lms->delFileExit('img_student');
     $lms->delFileExit('img_teacher');
     $lms->delFileExit('img_subject');
